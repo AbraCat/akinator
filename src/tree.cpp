@@ -47,12 +47,29 @@ ErrEnum insertNode(Tree* tree, NodeVal val)
     }
 
     Node* node = tree->root;
-    while (node->lft != NULL)
+    int insert_lft = 0;
+    while (1)
     {
-        if (val <= node->val) node = node->lft;
-        else node = node->rgt;
+        if (val <= node->val)
+        {
+            if (node->lft == NULL)
+            {
+                insert_lft = 1;
+                break;
+            }
+            node = node->lft;
+        }
+        else
+        {
+            if (node->rgt == NULL)
+            {
+                insert_lft = 0;
+                break;
+            }
+            node = node->rgt;
+        }
     }
-    if (val <= node->val) returnErr(nodeCtor(&node->lft, val, node, NULL, NULL))
+    if (insert_lft) returnErr(nodeCtor(&node->lft, val, node, NULL, NULL))
     else returnErr(nodeCtor(&node->rgt, val, node, NULL, NULL))
     ++(tree->n_nodes);
     return ERR_OK;
@@ -78,8 +95,23 @@ ErrEnum treeWrite(FILE* fout, Tree* tree)
 ErrEnum treeRead(FILE* fin, Tree* tree)
 {
     //
-    
+
     return ERR_OK;
+}
+
+void printNodeDot(FILE* fout, Node* node)
+{
+    fprintf(fout, "node%p [shape=Mrecord,label=\"%d\"]\n", node, node->val);
+    if (node->lft != NULL)
+    {
+        printNodeDot(fout, node->lft);
+        fprintf(fout, "node%p->node%p[color=blue]\n", node, node->lft);
+    }
+    if (node->rgt != NULL)
+    {
+        printNodeDot(fout, node->rgt);
+        fprintf(fout, "node%p->node%p[color=red]\n", node, node->rgt);
+    }
 }
 
 ErrEnum treeMakeGraph(Tree* tree)
@@ -99,7 +131,10 @@ ErrEnum treeMakeGraph(Tree* tree)
     FILE *fout = fopen(buf, "w");
     if (fout == NULL) return ERR_OPEN_FILE;
 
-    fputs("digraph Tree\n{aaa->bbb\n}\n", fout);
+    fputs("digraph Tree\n{\nrankdir=TB\n", fout);
+    if (tree->root == NULL) fputs("NULL\n", fout);
+    else printNodeDot(fout, tree->root);
+    fputs("}\n", fout);
 
     fclose(fout);
 

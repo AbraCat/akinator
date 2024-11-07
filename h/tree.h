@@ -5,7 +5,7 @@
 
 #include <error.h>
 
-typedef short NodeVal;
+typedef int NodeVal;
 
 struct Node
 {
@@ -30,6 +30,7 @@ void nodeDtor(Node* node);
 ErrEnum insertNode(Tree* tree, NodeVal val);
 void addSubtrees(Node* node, Node* lft, Node* rgt);
 
+void printNodeDot(FILE* fout, Node* node);
 ErrEnum treeMakeGraph(Tree* tree);
 ErrEnum treeDump(Tree* tree);
 
