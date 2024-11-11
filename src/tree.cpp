@@ -17,7 +17,7 @@ ErrEnum treeCtor(Tree* tree)
 void treeDtor(Tree* tree)
 {
     nodeDtor(tree->root);
-    if (tree->fdump != NULL) free(tree->fdump);
+    if (tree->fdump != NULL) fclose(tree->fdump);
 }
 
 ErrEnum nodeCtor(Node** node, ConstNodeVal val, Node* parent, Node* lft, Node* rgt)
