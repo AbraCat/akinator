@@ -22,7 +22,7 @@ void treeDtor(Tree* tree)
     if (tree->fdump != NULL) free(tree->fdump);
 }
 
-ErrEnum nodeCtor(Node** node, const NodeVal val, Node* parent, Node* lft, Node* rgt)
+ErrEnum nodeCtor(Node** node, ConstNodeVal val, Node* parent, Node* lft, Node* rgt)
 {
     *node = (Node*)calloc(1, sizeof(Node));
     if (*node == NULL) return ERR_MEM;
@@ -35,7 +35,7 @@ ErrEnum nodeCtor(Node** node, const NodeVal val, Node* parent, Node* lft, Node* 
     return ERR_OK;
 }
 
-ErrEnum nodeChangeVal(Node* node, NodeVal val)
+ErrEnum nodeChangeVal(Node* node, ConstNodeVal val)
 {
     if (val == NULL) return ERR_OK;
 
@@ -73,7 +73,7 @@ ErrEnum insertNode(Tree* tree, NodeVal val)
     int insert_lft = 0;
     while (1)
     {
-        if (val <= node->val)
+        if (val <= node->val) // if (nodeCmp(val, node->val) <= 0)
         {
             if (node->lft == NULL)
             {
@@ -105,6 +105,31 @@ void addSubtrees(Node* node, int* n_nodes, Tree* lft, Tree* rgt)
     node->lft = lft->root;
     node->rgt = rgt->root;
     n_nodes += lft->n_nodes + rgt->n_nodes;
+}
+
+int nodeCmp(NodeVal lft, NodeVal rgt)
+{
+    return strncmp(lft, rgt, node_buf_size);
+}
+
+void nodeFind(Node* node, const NodeVal val, Node** ans)
+{
+    myAssert(ans != NULL);
+
+    if (node == NULL)
+    {
+        *ans = NULL;
+        return;
+    }
+
+    if (nodeCmp(val, node->val) == 0)
+    {
+        *ans = node;
+        return;
+    }
+    nodeFind(node->lft, val, ans);
+    if (*ans != NULL) return;
+    nodeFind(node->rgt, val, ans);
 }
 
 const char log_path[] = "./log";
@@ -191,6 +216,13 @@ ErrEnum treeRead(FILE* fin, Tree* tree)
     
     returnErr(nodeCtor(&tree->root, NULL, NULL, NULL, NULL));
     returnErr(nodeRead(buf, &buf_pos, tree->root, &tree->n_nodes));
+
+    return ERR_OK;
+}
+
+ErrEnum treeVerify(Tree* tree)
+{
+    //
 
     return ERR_OK;
 }

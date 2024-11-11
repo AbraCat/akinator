@@ -6,6 +6,9 @@
 #include <error.h>
 
 typedef char* NodeVal;
+typedef const char* ConstNodeVal;
+
+extern const int node_buf_size;
 
 struct Node
 {
@@ -24,12 +27,16 @@ struct Tree
 ErrEnum treeCtor(Tree* tree);
 void treeDtor(Tree* tree);
 
-ErrEnum nodeCtor(Node** node, const NodeVal val, Node* parent, Node* lft, Node* rgt);
-ErrEnum nodeChangeVal(Node* node, NodeVal val);
+ErrEnum nodeCtor(Node** node, ConstNodeVal val, Node* parent, Node* lft, Node* rgt);
+ErrEnum nodeChangeVal(Node* node, ConstNodeVal val);
 void nodeDtor(Node* node);
+ErrEnum treeVerify(Tree* tree);
 
 ErrEnum insertNode(Tree* tree, NodeVal val);
 void addSubtrees(Node* node, int* n_nodes, Tree* lft, Tree* rgt);
+
+int nodeCmp(NodeVal lft, NodeVal rgt);
+void nodeFind(Node* node, const NodeVal val, Node** ans);
 
 void printNodeDot(FILE* fout, Node* node);
 ErrEnum treeMakeGraph(Tree* tree);

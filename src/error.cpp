@@ -4,11 +4,12 @@
 #include <error.h>
 #include <colors.h>
 
-const int n_errs = 3;
+const int n_errs = 4;
 ErrDescr err_arr[] = {{ERR_OK, "No error"}, 
 
 {ERR_MEM, "Couldn't allocate memory"},
-{ERR_OPEN_FILE, "Couldn't open file"}};
+{ERR_OPEN_FILE, "Couldn't open file"},
+{ERR_FILE, "File error"}};
 
 void myAssertFn(int expr, const char* str_expr, const char* file, int line, const char* function)
 {
