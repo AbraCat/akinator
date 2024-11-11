@@ -1,7 +1,9 @@
 #include <stdio.h>
+#include <string.h>
 
 #include <akinator.h>
 #include <error.h>
+#include <utils.h>
 
 // returnErr(nodeCtor(&tree.root, "aaa", NULL, NULL, NULL));
     // returnErr(nodeCtor(&tree.root->lft, "bbb", tree.root, NULL, NULL));
@@ -12,22 +14,23 @@
 
 int main(int argc, const char* argv[])
 {
+    // Tree tree = {};
+    // handleErr(treeCtor(&tree));
 
-    Tree tree = {};
-    handleErr(treeCtor(&tree));
+    // // FILE *fout = fopen("txt/database.txt", "w");
+    // // if (fout == NULL) handleErr(ERR_OPEN_FILE);
+    // // treeWrite(fout, &tree);
+    // // fclose(fout);
 
-    // FILE *fout = fopen("txt/database.txt", "w");
-    // if (fout == NULL) handleErr(ERR_OPEN_FILE);
-    // treeWrite(fout, &tree);
-    // fclose(fout);
+    // FILE *fin = fopen("txt/database.txt", "r");
+    // if (fin == NULL) handleErr(ERR_OPEN_FILE);
+    // returnErr(treeRead(fin, &tree));
+    // fclose(fin);
+    // returnErr(play(&tree, stdin, stdout));
 
-    FILE *fin = fopen("txt/database.txt", "r");
-    if (fin == NULL) handleErr(ERR_OPEN_FILE);
-    returnErr(treeRead(fin, &tree));
-    fclose(fin);
-    returnErr(play(&tree, stdin, stdout));
+    // treeDump(&tree);
+    // treeDtor(&tree);
+    // return 0;
 
-    treeDump(&tree);
-    treeDtor(&tree);
-    return 0;
+    return mainAkinCycle();
 }

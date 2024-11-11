@@ -7,8 +7,6 @@
 #define ELEM_ADR(elem) elem
 #define ELEM_FMT "%s"
 
-const int node_buf_size = 20;
-
 ErrEnum treeCtor(Tree* tree)
 {
     tree->root = NULL;
@@ -41,9 +39,9 @@ ErrEnum nodeChangeVal(Node* node, ConstNodeVal val)
 
     if (node->val == NULL)
     {
-        node->val = (NodeVal)calloc(node_buf_size, sizeof(char));
+        node->val = (NodeVal)calloc(small_buf_size, sizeof(char));
         if (node->val == NULL) return ERR_MEM;
-        strncpy(node->val, val, node_buf_size);
+        strncpy(node->val, val, small_buf_size);
     }
 
     return ERR_OK;
@@ -109,7 +107,7 @@ void addSubtrees(Node* node, int* n_nodes, Tree* lft, Tree* rgt)
 
 int nodeCmp(NodeVal lft, NodeVal rgt)
 {
-    return strncmp(lft, rgt, node_buf_size);
+    return strncmp(lft, rgt, small_buf_size);
 }
 
 void nodeFind(Node* node, const NodeVal val, Node** ans)
@@ -153,22 +151,22 @@ void nodeWrite(FILE* fout, Node* node)
 ErrEnum nodeRead(char* buf, int* buf_pos, Node* node, int* n_nodes)
 {
     #define cur_buf (buf + *buf_pos)
-    #define scanfBuf(fmt, ...)                           \
-    (                                                         \
-        scanf_res = sscanf(cur_buf,                 \
-        fmt "%n", __VA_ARGS__, &pos_incr),                    \
-        *buf_pos += pos_incr,                        \
-        scanf_res                                             \
+    #define scanfBuf(fmt, ...)             \
+    (                                      \
+        scanf_res = sscanf(cur_buf,        \
+        fmt "%n", __VA_ARGS__, &pos_incr), \
+        *buf_pos += pos_incr,              \
+        scanf_res                          \
     )
 
     // change error code
-    #define scanfBufExp(exp_res, fmt, ...)              \
+    #define scanfBufExp(exp_res, fmt, ...)         \
         if (scanfBuf(fmt, __VA_ARGS__) != exp_res) \
             return ERR_FILE;
 
     ++(*n_nodes);
     int scanf_res = 0, pos_incr = 0;
-    char val_buf[node_buf_size] = "";
+    char val_buf[small_buf_size] = "";
 
     if (cur_buf[0] != '{') {return ERR_FILE;} // change err code
     ++(*buf_pos);
@@ -207,6 +205,8 @@ ErrEnum nodeRead(char* buf, int* buf_pos, Node* node, int* n_nodes)
 
 ErrEnum treeRead(FILE* fin, Tree* tree)
 {
+    // doesn't work for empty file
+    
     if (tree->root != NULL) return ERR_FILE; // change err code
 
     tree->n_nodes = 0;

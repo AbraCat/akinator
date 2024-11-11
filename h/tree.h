@@ -8,7 +8,7 @@
 typedef char* NodeVal;
 typedef const char* ConstNodeVal;
 
-extern const int node_buf_size;
+const int small_buf_size = 20;
 
 struct Node
 {

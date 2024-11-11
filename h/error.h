@@ -23,13 +23,21 @@ enum ErrEnum
 {
     ERR_OK = 0,
 
+    ERR_ASSERT,
+    ERR_STACK_UNDERFLOW,
+    ERR_NULL_STACK,
+    ERR_BAD_SIZE,
+    ERR_POISON,
+    ERR_BAD_CANARY,
+    ERR_BAD_HASH,
+
     ERR_MEM,
     ERR_OPEN_FILE,
     ERR_FILE,
 
     ERR_NOT_NULL_TREE,
 
-    ERR_INVAL_YES_NO_ANS
+    ERR_INVAL_YES_NO_ANS,
 };
 
 struct ErrDescr
