@@ -27,6 +27,7 @@ enum ErrEnum
 
     ERR_MEM,
     ERR_OPEN_FILE,
+    ERR_FILE,
 };
 
 struct ErrDescr

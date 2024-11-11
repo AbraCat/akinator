@@ -5,7 +5,7 @@
 
 #include <error.h>
 
-typedef int NodeVal;
+typedef char* NodeVal;
 
 struct Node
 {
@@ -24,17 +24,20 @@ struct Tree
 ErrEnum treeCtor(Tree* tree);
 void treeDtor(Tree* tree);
 
-ErrEnum nodeCtor(Node** node, NodeVal val, Node* parent, Node* lft, Node* rgt);
+ErrEnum nodeCtor(Node** node, const NodeVal val, Node* parent, Node* lft, Node* rgt);
+ErrEnum nodeChangeVal(Node* node, NodeVal val);
 void nodeDtor(Node* node);
 
 ErrEnum insertNode(Tree* tree, NodeVal val);
-void addSubtrees(Node* node, Node* lft, Node* rgt);
+void addSubtrees(Node* node, int* n_nodes, Tree* lft, Tree* rgt);
 
 void printNodeDot(FILE* fout, Node* node);
 ErrEnum treeMakeGraph(Tree* tree);
 ErrEnum treeDump(Tree* tree);
 
-ErrEnum treeWrite(FILE* fout, Tree* tree);
+void nodeWrite(FILE* fout, Node* node);
+void treeWrite(FILE* fout, Tree* tree);
+ErrEnum nodeRead(char* buf, int* buf_pos, Node* node, int* n_nodes);
 ErrEnum treeRead(FILE* fin, Tree* tree);
 
 #endif // TREE_H
