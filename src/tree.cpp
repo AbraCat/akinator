@@ -58,8 +58,6 @@ void nodeDtor(Node* node)
 
 ErrEnum insertNode(Tree* tree, NodeVal val)
 {
-    // works for integer NodeVal
-    
     if (tree->root == NULL)
     {
         returnErr(nodeCtor(&tree->root, val, NULL, NULL, NULL));
@@ -71,7 +69,7 @@ ErrEnum insertNode(Tree* tree, NodeVal val)
     int insert_lft = 0;
     while (1)
     {
-        if (val <= node->val) // if (nodeCmp(val, node->val) <= 0)
+        if (nodeCmp(val, node->val) <= 0)
         {
             if (node->lft == NULL)
             {
@@ -159,24 +157,23 @@ ErrEnum nodeRead(char* buf, int* buf_pos, Node* node, int* n_nodes)
         scanf_res                          \
     )
 
-    // change error code
     #define scanfBufExp(exp_res, fmt, ...)         \
         if (scanfBuf(fmt, __VA_ARGS__) != exp_res) \
-            return ERR_FILE;
+            return ERR_TREE_FMT;
 
     ++(*n_nodes);
     int scanf_res = 0, pos_incr = 0;
     char val_buf[small_buf_size] = "";
 
-    if (cur_buf[0] != '{') {return ERR_FILE;} // change err code
+    if (cur_buf[0] != '{') {return ERR_TREE_FMT;}
     ++(*buf_pos);
-    if (cur_buf[0] != '"') return ERR_FILE; // change err code
+    if (cur_buf[0] != '"') return ERR_TREE_FMT;
     ++(*buf_pos);
 
     // returnErr(nodeCtor(node, cur_buf, ))
     scanfBufExp(1, "%[^\"]", val_buf);
     returnErr(nodeChangeVal(node, val_buf));
-    if (*cur_buf != '"') return ERR_FILE; //
+    if (*cur_buf != '"') return ERR_TREE_FMT;
     ++(*buf_pos);
 
     if (*cur_buf == '}')
@@ -197,7 +194,7 @@ ErrEnum nodeRead(char* buf, int* buf_pos, Node* node, int* n_nodes)
     returnErr(nodeCtor(&node->rgt, NULL, node, NULL, NULL));
     returnErr(nodeRead(buf, buf_pos, node->rgt, n_nodes));
 
-    if (*cur_buf != '}') return ERR_FILE;
+    if (*cur_buf != '}') return ERR_TREE_FMT;
     ++(*buf_pos);
 
     return ERR_OK;
@@ -207,7 +204,7 @@ ErrEnum treeRead(FILE* fin, Tree* tree)
 {
     // doesn't work for empty file
     
-    if (tree->root != NULL) return ERR_FILE; // change err code
+    myAssert(tree->root == NULL);
 
     tree->n_nodes = 0;
     int buf_pos = 0;
@@ -220,10 +217,38 @@ ErrEnum treeRead(FILE* fin, Tree* tree)
     return ERR_OK;
 }
 
+void nNodes(Node* node, int* ans)
+{
+    myAssert(ans != NULL);
+
+    if (node == NULL)
+    {
+        *ans = 0;
+        return;
+    }
+    int ans_lft = 0, ans_rgt = 0;
+    nNodes(node->lft, &ans_lft);
+    nNodes(node->rgt, &ans_rgt);
+    *ans = ans_lft + ans_rgt + 1;
+}
+
+ErrEnum nodeVerify(Node* node)
+{
+    if (node == NULL) return ERR_OK;
+    if (node->lft != NULL && node->lft->parent != node) return ERR_INVAL_CONNECT;
+    if (node->rgt != NULL && node->rgt->parent != node) return ERR_INVAL_CONNECT;
+    returnErr(nodeVerify(node->lft));
+    returnErr(nodeVerify(node->lft));
+    return ERR_OK;
+}
+
 ErrEnum treeVerify(Tree* tree)
 {
-    //
-
+    if (tree == NULL) return ERR_NULL_TREE;
+    int n_nodes = 0;
+    nNodes(tree->root, &n_nodes);
+    if (n_nodes != tree->n_nodes) return ERR_INVAL_NNODES;
+    returnErr(nodeVerify(tree->root));
     return ERR_OK;
 }
 

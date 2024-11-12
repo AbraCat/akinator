@@ -4,7 +4,7 @@
 #include <error.h>
 #include <colors.h>
 
-const int n_errs = 4;
+const int n_errs = 16;
 ErrDescr err_arr[] = {{ERR_OK, "No error"}, 
 
 {ERR_MEM, "Couldn't allocate memory"},

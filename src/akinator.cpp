@@ -99,8 +99,7 @@ ErrEnum akinPlay(Tree* tree, FILE* fin, FILE* fout)
 ErrEnum printDescr(FILE* fout, Tree* tree, Node* node)
 {
     myAssert(fout != NULL && tree != NULL && node != NULL);
-
-    // if (node->lft != NULL) return ERR_NOT_OBJECT;
+    myAssert(node->lft == NULL && node->rgt == NULL);
 
     Node* init_node = node;
     Stack st = {};

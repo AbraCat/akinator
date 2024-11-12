@@ -30,6 +30,9 @@ void treeDtor(Tree* tree);
 ErrEnum nodeCtor(Node** node, ConstNodeVal val, Node* parent, Node* lft, Node* rgt);
 ErrEnum nodeChangeVal(Node* node, ConstNodeVal val);
 void nodeDtor(Node* node);
+
+void nNodes(Node* node, int* ans);
+ErrEnum nodeVerify(Node* node);
 ErrEnum treeVerify(Tree* tree);
 
 ErrEnum insertNode(Tree* tree, NodeVal val);

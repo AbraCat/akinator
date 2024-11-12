@@ -23,6 +23,10 @@ enum ErrEnum
 {
     ERR_OK = 0,
 
+    ERR_MEM,
+    ERR_OPEN_FILE,
+    ERR_FILE,
+
     ERR_ASSERT,
     ERR_STACK_UNDERFLOW,
     ERR_NULL_STACK,
@@ -31,11 +35,10 @@ enum ErrEnum
     ERR_BAD_CANARY,
     ERR_BAD_HASH,
 
-    ERR_MEM,
-    ERR_OPEN_FILE,
-    ERR_FILE,
-
-    ERR_NOT_NULL_TREE,
+    ERR_NULL_TREE,
+    ERR_INVAL_CONNECT,
+    ERR_INVAL_NNODES,
+    ERR_TREE_FMT,
 
     ERR_INVAL_YES_NO_ANS,
 };
