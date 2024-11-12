@@ -8,7 +8,7 @@
 typedef char* NodeVal;
 typedef const char* ConstNodeVal;
 
-const int small_buf_size = 20;
+const int small_buf_size = 100;
 
 struct Node
 {
@@ -40,6 +40,7 @@ void addSubtrees(Node* node, int* n_nodes, Tree* lft, Tree* rgt);
 
 int nodeCmp(NodeVal lft, NodeVal rgt);
 void nodeFind(Node* node, const NodeVal val, Node** ans);
+void nodeFindLeaf(Node* node, const NodeVal val, Node** ans);
 
 void printNodeDot(FILE* fout, Node* node);
 ErrEnum treeMakeGraph(Tree* tree);

@@ -172,10 +172,7 @@ ErrEnum resize(Stack* st, int new_capacity)
         new_data = (StackElem*)realloc(st->data == NULL ? NULL : st->data - 1, (new_capacity + 2) * sizeof(StackElem)) + 1;
     )
 
-    if (new_data == NULL)
-    {
-        return ERR_MEM;
-    }
+    if (new_data == NULL) return ERR_MEM;
 
     st->data = new_data;
 
@@ -186,9 +183,7 @@ ErrEnum resize(Stack* st, int new_capacity)
     ST_ON_DEBUG
     (
         for (int i = st->size; i < new_capacity; ++i)
-        {
             st->data[i] = poison_val;
-        }
     )
 
     return ERR_OK;

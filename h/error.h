@@ -22,6 +22,7 @@
 enum ErrEnum
 {
     ERR_OK = 0,
+    ERR_UNKNOWN,
 
     ERR_MEM,
     ERR_OPEN_FILE,
@@ -39,6 +40,7 @@ enum ErrEnum
     ERR_INVAL_CONNECT,
     ERR_INVAL_NNODES,
     ERR_TREE_FMT,
+    ERR_NOT_LEAF,
 
     ERR_INVAL_YES_NO_ANS,
 };

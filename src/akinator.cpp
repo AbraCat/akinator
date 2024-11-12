@@ -13,6 +13,7 @@ ErrEnum akinInit(Tree* tree)
     treeDtor(tree);
     returnErr(treeCtor(tree));
     returnErr(nodeCtor(&tree->root, "Unknown thing", NULL, NULL, NULL));
+    ++(tree->n_nodes);
 
     return ERR_OK;
 }
@@ -20,11 +21,12 @@ ErrEnum akinInit(Tree* tree)
 ErrEnum addEntry(Tree* tree, Node* node, const char* name, const char* diff)
 {
     myAssert(tree != NULL && node != NULL && name != NULL && diff != NULL);
+    myAssert(node->lft == NULL && node->rgt == NULL);
 
     returnErr(nodeCtor(&node->lft, node->val, node, NULL, NULL));
     returnErr(nodeCtor(&node->rgt, name, node, NULL, NULL));
-    strncpy(node->val, diff, small_buf_size);
-    ++(tree->n_nodes);
+    nodeChangeVal(node, diff);
+    tree->n_nodes += 2;
 
     return ERR_OK;
 }
@@ -99,13 +101,12 @@ ErrEnum akinPlay(Tree* tree, FILE* fin, FILE* fout)
 ErrEnum printDescr(FILE* fout, Tree* tree, Node* node)
 {
     myAssert(fout != NULL && tree != NULL && node != NULL);
-    myAssert(node->lft == NULL && node->rgt == NULL);
+    if (node->lft != NULL || node->rgt != NULL) return ERR_NOT_LEAF;
 
     Node* init_node = node;
     Stack st = {};
     returnErr(stCtor(&st, 0));
 
-    node = node->parent;
     while (node != NULL)
     {
         returnErr(stPush(&st, node));
@@ -114,9 +115,10 @@ ErrEnum printDescr(FILE* fout, Tree* tree, Node* node)
 
     Node* pop_node = NULL;
     fprintf(fout, "Определение %s: ", init_node->val);
-    while (st.size > 0)
+    while (st.size > 1)
     {
         returnErr(stPop(&st, &pop_node));
+        if (pop_node->lft == st.data[st.size - 1]) fputs("не ", fout);
         fprintf(fout, "%s ", pop_node->val);
     }
     putc('\n', fout);
@@ -127,19 +129,19 @@ ErrEnum printDescr(FILE* fout, Tree* tree, Node* node)
 ErrEnum printCmp(FILE* fout, Tree* tree, Node* node1, Node* node2)
 {
     myAssert(fout != NULL && tree != NULL && node1 != NULL && node2 != NULL);
+    if (node1->lft != NULL || node1->rgt != NULL || node2->lft != NULL || node2->rgt != NULL)
+        return ERR_NOT_LEAF;
 
     Node* init_node1 = node1, *init_node2 = node2;
     Stack st1 = {}, st2 = {};
     returnErr(stCtor(&st1, 0));
     returnErr(stCtor(&st2, 0));
 
-    node1 = node1->parent;
     while (node1 != NULL)
     {
         returnErr(stPush(&st1, node1));
         node1 = node1->parent;
     }
-    node2 = node2->parent;
     while (node2 != NULL)
     {
         returnErr(stPush(&st2, node2));
@@ -148,23 +150,28 @@ ErrEnum printCmp(FILE* fout, Tree* tree, Node* node1, Node* node2)
 
     Node *pop_node1 = NULL, *pop_node2 = NULL;
     fprintf(fout, "%s похож на %s тем что они оба ", init_node1->val, init_node2->val);
-    while (st1.size > 0 && st2.size > 0)
+    while (st1.size > 1 && st2.size > 1)
     {
+        myAssert(st1.data[st1.size - 1] == st2.data[st2.size - 1]);
+        if (st1.data[st1.size - 2] != st2.data[st2.size - 2]) break;
+
         returnErr(stPop(&st1, &pop_node1));
         returnErr(stPop(&st2, &pop_node2));
-        if (pop_node1 != pop_node2) break;
+        if (pop_node1->lft == st1.data[st1.size - 1]) fputs("не ", fout);
         fprintf(fout, "%s ", pop_node1->val);
     }
     fprintf(fout, ", но они отличаются тем, что %s ", init_node1->val);
-    while (st1.size > 0)
+    while (st1.size > 1)
     {
         returnErr(stPop(&st1, &pop_node1));
+        if (pop_node1->lft == st1.data[st1.size - 1]) fputs("не ", fout);
         fprintf(fout, "%s ", pop_node1->val);
     }
     fprintf(fout, ", а %s ", init_node2->val);
-    while (st2.size > 0)
+    while (st2.size > 1)
     {
         returnErr(stPop(&st2, &pop_node2));
+        if (pop_node2->lft == st2.data[st2.size - 1]) fputs("не ", fout);
         fprintf(fout, "%s ", pop_node2->val);
     }
     putc('\n', fout);
@@ -206,6 +213,8 @@ ErrEnum mainAkinCycle()
     treeRead(fdb_in, &tree);
     fclose(fdb_in);
 
+    returnErr(treeVerify(&tree));
+
     char cmd_buf[small_buf_size] = "", arg_buf1[small_buf_size] = "", arg_buf2[small_buf_size] = "";
     int inval_cmd_cnt = 0;
     while (1)
@@ -228,7 +237,7 @@ ErrEnum mainAkinCycle()
             Node* node = NULL;
             puts("Введите название объекта: ");
             scanf(" %[^\n]", arg_buf1);
-            nodeFind(tree.root, arg_buf1, &node);
+            nodeFindLeaf(tree.root, arg_buf1, &node);
             if (node == NULL)
             {
                 printf("Такого объекта нет (%s)\n", arg_buf1);
@@ -243,7 +252,7 @@ ErrEnum mainAkinCycle()
 
             puts("Введите название первого объекта: ");
             scanf(" %[^\n]", arg_buf1);
-            nodeFind(tree.root, arg_buf1, &node1);
+            nodeFindLeaf(tree.root, arg_buf1, &node1);
             if (node1 == NULL)
             {
                 printf("Такого объекта нет (%s)\n", arg_buf1);
@@ -252,7 +261,7 @@ ErrEnum mainAkinCycle()
 
             puts("Введите название второго объекта: ");
             scanf(" %[^\n]", arg_buf2);
-            nodeFind(tree.root, arg_buf2, &node2);
+            nodeFindLeaf(tree.root, arg_buf2, &node2);
             if (node2 == NULL)
             {
                 printf("Такого объекта нет (%s)\n", arg_buf2);
@@ -288,6 +297,8 @@ ErrEnum mainAkinCycle()
         }
         printf("Invalid command. Try again (type \"%s\" for help):\n", help_cmd);
     }
+
+    returnErr(treeVerify(&tree));
     
     treeDtor(&tree);
     return ERR_OK;

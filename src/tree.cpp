@@ -22,8 +22,13 @@ void treeDtor(Tree* tree)
 
 ErrEnum nodeCtor(Node** node, ConstNodeVal val, Node* parent, Node* lft, Node* rgt)
 {
-    *node = (Node*)calloc(1, sizeof(Node));
-    if (*node == NULL) return ERR_MEM;
+    myAssert(node != NULL);
+
+    if (*node == NULL) 
+    {
+        *node = (Node*)calloc(1, sizeof(Node));
+        if (*node == NULL) return ERR_MEM;
+    }
     
     returnErr(nodeChangeVal(*node, val));
 
@@ -35,14 +40,21 @@ ErrEnum nodeCtor(Node** node, ConstNodeVal val, Node* parent, Node* lft, Node* r
 
 ErrEnum nodeChangeVal(Node* node, ConstNodeVal val)
 {
-    if (val == NULL) return ERR_OK;
+    myAssert(node != NULL);
+
+    if (val == NULL)
+    {
+        free(node->val);
+        node->val = NULL;
+        return ERR_OK;
+    }
 
     if (node->val == NULL)
     {
         node->val = (NodeVal)calloc(small_buf_size, sizeof(char));
         if (node->val == NULL) return ERR_MEM;
-        strncpy(node->val, val, small_buf_size);
     }
+    strncpy(node->val, val, small_buf_size);
 
     return ERR_OK;
 }
@@ -126,6 +138,25 @@ void nodeFind(Node* node, const NodeVal val, Node** ans)
     nodeFind(node->lft, val, ans);
     if (*ans != NULL) return;
     nodeFind(node->rgt, val, ans);
+}
+
+void nodeFindLeaf(Node* node, const NodeVal val, Node** ans)
+{
+    myAssert(ans != NULL);
+
+    if (node == NULL)
+    {
+        *ans = NULL;
+        return;
+    }
+    if (node->lft == NULL && node->rgt == NULL && nodeCmp(val, node->val) == 0)
+    {
+        *ans = node;
+        return;
+    }
+    nodeFindLeaf(node->lft, val, ans);
+    if (*ans != NULL) return;
+    nodeFindLeaf(node->rgt, val, ans);
 }
 
 const char log_path[] = "./log";
